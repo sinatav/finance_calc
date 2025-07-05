@@ -10,6 +10,7 @@ def main_menu():
     print("4. Zero-Coupon Bond YTM")
     print("5. Coupon-Bearing Bond YTM (Simplified)")
     print("6. Coupon-Bearing Bond YTM (Original)")
+    print("7. Coupon-Bearing Bond YTM (Continuous Compounding)")
     print("0. Exit")
 
 
@@ -80,6 +81,18 @@ def run_coupon_bearing_bond_original():
     print(f"Original Coupon-Bearing Bond YTM: {ytm * 100:.4f}%")
 
 
+def run_coupon_bearing_bond_continuous():
+    F = get_float("Face value (F): ")
+    c = get_float("Annual coupon rate (decimal, e.g., 0.06): ")
+    P = get_float("Price (P): ")
+    t = get_float("Time to maturity in years (t): ")
+    freq = int(get_float("Coupon payments per year (e.g., 2 for semiannual): "))
+    bond = CouponBearingBond(F, c, P, t, freq)
+    ytm = bond.ytm_continuous()
+    print(f"Continuous Compounding Coupon-Bearing Bond YTM: {ytm*100:.4f}%")
+
+
+
 def main():
     while True:
         main_menu()
@@ -96,6 +109,8 @@ def main():
             run_coupon_bearing_bond_simplified()
         elif choice == '6':
             run_coupon_bearing_bond_original()
+        elif choice == '7':
+            run_coupon_bearing_bond_continuous()
         elif choice == '0':
             print("Exiting...")
             break
