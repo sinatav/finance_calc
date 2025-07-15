@@ -1,5 +1,6 @@
 from interests import SimpleInterest, CompoundInterest, ContinuousCompounding
 from bonds import ZeroCouponBond, CouponBearingBond
+from options import Option
 
 
 def main_menu():
@@ -11,6 +12,7 @@ def main_menu():
     print("5. Coupon-Bearing Bond YTM (Simplified)")
     print("6. Coupon-Bearing Bond YTM (Original)")
     print("7. Coupon-Bearing Bond YTM (Continuous Compounding)")
+    print("8. Black-Scholes Option Pricing & Greeks")
     print("0. Exit")
 
 
@@ -92,6 +94,25 @@ def run_coupon_bearing_bond_continuous():
     print(f"Continuous Compounding Coupon-Bearing Bond YTM: {ytm*100:.4f}%")
 
 
+def run_option_pricing():
+    S = get_float("Stock price (S): ")
+    K = get_float("Strike price (K): ")
+    T = get_float("Time to maturity (in years): ")
+    r = get_float("Risk-free rate (as decimal): ")
+    sigma = get_float("Volatility (as decimal, e.g., 0.2 for 20%): ")
+    option_type = input("Option type ('call' or 'put'): ").strip().lower()
+
+    try:
+        opt = Option(S, K, T, r, sigma, option_type)
+        price = opt.price()
+        greeks = opt.greeks()
+        print(f"\n{option_type.capitalize()} Option Price: ${price:.2f}")
+        print("Option Greeks:")
+        for greek, val in greeks.items():
+            print(f"  {greek}: {val:.4f}")
+    except ValueError as e:
+        print(f"Error: {e}")
+
 
 def main():
     while True:
@@ -111,6 +132,8 @@ def main():
             run_coupon_bearing_bond_original()
         elif choice == '7':
             run_coupon_bearing_bond_continuous()
+        elif choice == '8':
+            run_option_pricing()
         elif choice == '0':
             print("Exiting...")
             break
