@@ -1,6 +1,6 @@
 from interests import SimpleInterest, CompoundInterest, ContinuousCompounding
 from bonds import ZeroCouponBond, CouponBearingBond
-from options import Option
+from options import Option, plot_greeks_vs_price
 
 
 def main_menu():
@@ -13,6 +13,7 @@ def main_menu():
     print("6. Coupon-Bearing Bond YTM (Original)")
     print("7. Coupon-Bearing Bond YTM (Continuous Compounding)")
     print("8. Black-Scholes Option Pricing & Greeks")
+    print("9. Plot Option Greeks vs Stock Price")
     print("0. Exit")
 
 
@@ -113,6 +114,19 @@ def run_option_pricing():
     except ValueError as e:
         print(f"Error: {e}")
 
+def run_option_plot():
+    print("Enter parameters for plotting Option Greeks:")
+    K = get_float("Strike price (K): ")
+    T = get_float("Time to maturity (years): ")
+    r = get_float("Risk-free rate (decimal): ")
+    sigma = get_float("Volatility (decimal, e.g., 0.2): ")
+    option_type = input("Option type ('call' or 'put'): ").strip().lower()
+    s_min = get_float("Minimum stock price to plot: ")
+    s_max = get_float("Maximum stock price to plot: ")
+    step = get_float("Step size: ")
+
+    plot_greeks_vs_price(K, T, r, sigma, option_type, S_range=(s_min, s_max), step=step)
+
 
 def main():
     while True:
@@ -134,6 +148,8 @@ def main():
             run_coupon_bearing_bond_continuous()
         elif choice == '8':
             run_option_pricing()
+        elif choice == '9':
+            run_option_plot()
         elif choice == '0':
             print("Exiting...")
             break
