@@ -10,6 +10,95 @@ from matplotlib.figure import Figure
 from interests import SimpleInterest, CompoundInterest, ContinuousCompounding
 from bonds import ZeroCouponBond, CouponBearingBond
 from options import Option, plot_greeks_vs_price  # Make sure plot_greeks_vs_price exists in options.py
+from PySide6.QtWidgets import (
+    QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QComboBox, QHBoxLayout, QMessageBox
+)
+from pricing.monte_carlo import monte_carlo_option_price
+from pricing.binomial_tree import binomial_tree_option_price
+from pricing.pde_solver import crank_nicolson_option_price
+
+
+class AdvancedPricingTab(QWidget):
+    def __init__(self):
+        super().__init__()
+        layout = QVBoxLayout()
+
+        self.S_input = QLineEdit()
+        self.K_input = QLineEdit()
+        self.T_input = QLineEdit()
+        self.r_input = QLineEdit()
+        self.sigma_input = QLineEdit()
+
+        self.option_type_box = QComboBox()
+        self.option_type_box.addItems(["call", "put"])
+
+        self.method_box = QComboBox()
+        self.method_box.addItems(["Monte Carlo", "Binomial Tree", "Crank-Nicolson PDE"])
+
+        self.steps_input = QLineEdit()  # Used for simulations or tree steps
+        self.steps_input.setPlaceholderText("Steps/Simulations (e.g., 100000)")
+
+        self.american_checkbox = QComboBox()
+        self.american_checkbox.addItems(["No", "Yes"])
+
+        button = QPushButton("Calculate")
+        button.clicked.connect(self.calculate)
+
+        layout.addWidget(QLabel("Stock Price (S):"))
+        layout.addWidget(self.S_input)
+
+        layout.addWidget(QLabel("Strike Price (K):"))
+        layout.addWidget(self.K_input)
+
+        layout.addWidget(QLabel("Time to Maturity (T in years):"))
+        layout.addWidget(self.T_input)
+
+        layout.addWidget(QLabel("Risk-Free Rate (r):"))
+        layout.addWidget(self.r_input)
+
+        layout.addWidget(QLabel("Volatility (sigma):"))
+        layout.addWidget(self.sigma_input)
+
+        layout.addWidget(QLabel("Option Type:"))
+        layout.addWidget(self.option_type_box)
+
+        layout.addWidget(QLabel("Pricing Method:"))
+        layout.addWidget(self.method_box)
+
+        layout.addWidget(QLabel("Steps/Simulations:"))
+        layout.addWidget(self.steps_input)
+
+        layout.addWidget(QLabel("Is American Option? (only for Binomial):"))
+        layout.addWidget(self.american_checkbox)
+
+        layout.addWidget(button)
+        self.setLayout(layout)
+
+    def calculate(self):
+        try:
+            S = float(self.S_input.text())
+            K = float(self.K_input.text())
+            T = float(self.T_input.text())
+            r = float(self.r_input.text())
+            sigma = float(self.sigma_input.text())
+            option_type = self.option_type_box.currentText()
+            method = self.method_box.currentText()
+            steps = int(self.steps_input.text()) if self.steps_input.text() else 100
+            is_american = self.american_checkbox.currentText() == "Yes"
+
+            if method == "Monte Carlo":
+                price = monte_carlo_option_price(S, K, T, r, sigma, option_type, steps)
+            elif method == "Binomial Tree":
+                price = binomial_tree_option_price(S, K, T, r, sigma, steps, option_type, is_american)
+            elif method == "Crank-Nicolson PDE":
+                price = crank_nicolson_option_price(S, K, T, r, sigma, option_type=option_type)
+            else:
+                raise ValueError("Unknown method")
+
+            QMessageBox.information(self, "Result", f"{method} {option_type.capitalize()} Option Price: ${price:.4f}")
+
+        except Exception as e:
+            QMessageBox.warning(self, "Error", str(e))
 
 
 class SimpleInterestTab(QWidget):
