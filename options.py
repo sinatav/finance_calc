@@ -31,6 +31,62 @@ class Option:
         self.sigma = sigma      # Volatility (as decimal, e.g., 0.2)
         self.option_type = option_type.lower()
 
+
+    def delta_hedge_shares(self, target_exposure=1):
+        """
+        Calculate number of shares of underlying to hedge the option delta.
+
+        target_exposure: number of option contracts (default 1)
+        Returns:
+            shares needed to hedge delta exposure (can be fractional)
+        """
+        delta = self.greeks()['Delta']
+        # Hedge shares = -delta * number of options (negative delta means short shares)
+        return -delta * target_exposure
+
+    def gamma_hedge_options(self, other_option, target_exposure=1):
+        """
+        Calculate how many of another option are needed to gamma hedge this option.
+
+        other_option: an Option object with different strike/maturity
+        target_exposure: number of this option contracts (default 1)
+        Returns:
+            number of other_option contracts to hedge gamma risk
+        """
+        gamma_self = self.greeks()['Gamma']
+        gamma_other = other_option.greeks()['Gamma']
+        if gamma_other == 0:
+            raise ValueError("Cannot hedge with option having zero gamma")
+        return - (gamma_self * target_exposure) / gamma_other
+
+    def theta_vega_positioning(self, other_option, target_exposure=1):
+        """
+        Calculate ratio of other_option contracts needed to offset Theta and Vega risk.
+
+        other_option: an Option object with different strike/maturity
+        target_exposure: number of this option contracts (default 1)
+        Returns:
+            dict with number of other_option to hedge Theta and Vega separately
+        """
+        theta_self = self.greeks()['Theta']
+        vega_self = self.greeks()['Vega']
+        theta_other = other_option.greeks()['Theta']
+        vega_other = other_option.greeks()['Vega']
+
+        results = {}
+        if theta_other != 0:
+            results['theta_hedge'] = - (theta_self * target_exposure) / theta_other
+        else:
+            results['theta_hedge'] = None
+
+        if vega_other != 0:
+            results['vega_hedge'] = - (vega_self * target_exposure) / vega_other
+        else:
+            results['vega_hedge'] = None
+
+        return results
+
+
     def price(self):
         d1 = (np.log(self.S / self.K) + (self.r + 0.5 * self.sigma ** 2) * self.T) / (self.sigma * np.sqrt(self.T))
         d2 = d1 - self.sigma * np.sqrt(self.T)
