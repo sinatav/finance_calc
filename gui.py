@@ -20,6 +20,103 @@ from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QComboBox, QMessageBox
 )
 from pricing.exotic_options import asian_option_price, digital_option_price
+from PySide6.QtWidgets import (
+    QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox, QHBoxLayout
+)
+from pricing.binomial_tree_extended import one_step_binomial_call, multi_step_binomial_call
+
+
+class BinomialPricingTab(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        layout = QVBoxLayout()
+
+        # Common inputs
+        self.S_input = QLineEdit()
+        self.K_input = QLineEdit()
+        self.r_input = QLineEdit()
+        self.method_selector = QLineEdit()
+        self.method_selector.setPlaceholderText("Enter 1 for One-Step, 2 for Multi-Step")
+
+        # One-step specific
+        self.u_input = QLineEdit()
+        self.d_input = QLineEdit()
+
+        # Multi-step specific
+        self.T_input = QLineEdit()
+        self.sigma_input = QLineEdit()
+        self.N_input = QLineEdit()
+
+        # Labels
+        layout.addWidget(QLabel("Current Stock Price (S):"))
+        layout.addWidget(self.S_input)
+
+        layout.addWidget(QLabel("Strike Price (K):"))
+        layout.addWidget(self.K_input)
+
+        layout.addWidget(QLabel("Risk-free Rate (decimal):"))
+        layout.addWidget(self.r_input)
+
+        layout.addWidget(QLabel("Choose Method: 1=One-Step, 2=Multi-Step"))
+        layout.addWidget(self.method_selector)
+
+        # One-Step inputs
+        layout.addWidget(QLabel("Up factor (u) [One-Step only]:"))
+        layout.addWidget(self.u_input)
+
+        layout.addWidget(QLabel("Down factor (d) [One-Step only]:"))
+        layout.addWidget(self.d_input)
+
+        # Multi-Step inputs
+        layout.addWidget(QLabel("Time to Maturity (T in years) [Multi-Step only]:"))
+        layout.addWidget(self.T_input)
+
+        layout.addWidget(QLabel("Volatility (sigma) [Multi-Step only]:"))
+        layout.addWidget(self.sigma_input)
+
+        layout.addWidget(QLabel("Number of Steps (N) [Multi-Step only]:"))
+        layout.addWidget(self.N_input)
+
+        # Calculate button
+        btn = QPushButton("Calculate Binomial Price")
+        btn.clicked.connect(self.calculate)
+        layout.addWidget(btn)
+
+        self.setLayout(layout)
+
+    def calculate(self):
+        try:
+            S = float(self.S_input.text())
+            K = float(self.K_input.text())
+            r = float(self.r_input.text())
+            method = self.method_selector.text().strip()
+
+            if method == '1':
+                # One-step requires u, d
+                u = float(self.u_input.text())
+                d = float(self.d_input.text())
+                result = one_step_binomial_call(S, K, u, d, r)
+                msg = (
+                    f"Risk-neutral Probability p: {result['p']:.4f}\n"
+                    f"Call Value if Up (Cu): {result['Cu']:.4f}\n"
+                    f"Call Value if Down (Cd): {result['Cd']:.4f}\n"
+                    f"Current Call Price: {result['Call Price']:.4f}"
+                )
+            elif method == '2':
+                T = float(self.T_input.text())
+                sigma = float(self.sigma_input.text())
+                N = int(self.N_input.text())
+                price = multi_step_binomial_call(S, K, T, r, sigma, N)
+                msg = f"Multi-Step Binomial Call Option Price: {price:.4f}"
+            else:
+                QMessageBox.warning(self, "Error", "Please enter method as '1' or '2'")
+                return
+
+            QMessageBox.information(self, "Result", msg)
+
+        except Exception as e:
+            QMessageBox.warning(self, "Error", str(e))
 
 
 class ExoticOptionTab(QWidget):
@@ -557,6 +654,7 @@ class FinanceApp(QWidget):
         tabs.addTab(OptionPlotTab(), "Option Greeks Plot")
         tabs.addTab(AdvancedPricingTab(), "Advanced Pricing")
         tabs.addTab(ExoticOptionTab(), "Exotic Options")
+        tabs.addTab(BinomialPricingTab(), "Binomial Pricing")
 
         layout = QVBoxLayout()
         layout.addWidget(tabs)
