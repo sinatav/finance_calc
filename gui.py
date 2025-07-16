@@ -24,6 +24,150 @@ from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox, QHBoxLayout
 )
 from pricing.binomial_tree_extended import one_step_binomial_call, multi_step_binomial_call
+from PySide6.QtWidgets import QTabWidget, QHBoxLayout
+from plotting import plot_greeks_vs_time, plot_delta_gamma_surface
+from hedging_sim import simulate_delta_hedging, simulate_covered_call
+
+
+class GreeksEvolutionTab(QWidget):
+    def __init__(self):
+        super().__init__()
+        layout = QVBoxLayout()
+
+        self.s = QLineEdit()
+        self.k = QLineEdit()
+        self.r = QLineEdit()
+        self.sigma = QLineEdit()
+        self.tmax = QLineEdit()
+        self.opt_type = QLineEdit()
+
+        layout.addWidget(QLabel("Stock Price (S):"))
+        layout.addWidget(self.s)
+        layout.addWidget(QLabel("Strike Price (K):"))
+        layout.addWidget(self.k)
+        layout.addWidget(QLabel("Risk-Free Rate (r):"))
+        layout.addWidget(self.r)
+        layout.addWidget(QLabel("Volatility (σ):"))
+        layout.addWidget(self.sigma)
+        layout.addWidget(QLabel("Max Time to Maturity (T):"))
+        layout.addWidget(self.tmax)
+        layout.addWidget(QLabel("Option Type (call/put):"))
+        layout.addWidget(self.opt_type)
+
+        btn = QPushButton("Plot Greeks vs Time")
+        btn.clicked.connect(self.plot)
+        layout.addWidget(btn)
+        self.setLayout(layout)
+
+    def plot(self):
+        try:
+            plot_greeks_vs_time(
+                float(self.s.text()),
+                float(self.k.text()),
+                float(self.r.text()),
+                float(self.sigma.text()),
+                self.opt_type.text().strip().lower(),
+                float(self.tmax.text())
+            )
+        except Exception as e:
+            QMessageBox.warning(self, "Error", str(e))
+
+
+class SurfacePlotTab(QWidget):
+    def __init__(self):
+        super().__init__()
+        layout = QVBoxLayout()
+
+        self.k = QLineEdit()
+        self.r = QLineEdit()
+        self.sigma = QLineEdit()
+        self.opt_type = QLineEdit()
+
+        layout.addWidget(QLabel("Strike Price (K):"))
+        layout.addWidget(self.k)
+        layout.addWidget(QLabel("Risk-Free Rate (r):"))
+        layout.addWidget(self.r)
+        layout.addWidget(QLabel("Volatility (σ):"))
+        layout.addWidget(self.sigma)
+        layout.addWidget(QLabel("Option Type (call/put):"))
+        layout.addWidget(self.opt_type)
+
+        btn = QPushButton("Plot Delta & Gamma Surface")
+        btn.clicked.connect(self.plot)
+        layout.addWidget(btn)
+        self.setLayout(layout)
+
+    def plot(self):
+        try:
+            plot_delta_gamma_surface(
+                float(self.k.text()),
+                float(self.r.text()),
+                float(self.sigma.text()),
+                self.opt_type.text().strip().lower()
+            )
+        except Exception as e:
+            QMessageBox.warning(self, "Error", str(e))
+
+
+class HedgingSimTab(QWidget):
+    def __init__(self):
+        super().__init__()
+        layout = QVBoxLayout()
+
+        self.s0 = QLineEdit()
+        self.k = QLineEdit()
+        self.t = QLineEdit()
+        self.r = QLineEdit()
+        self.sigma = QLineEdit()
+        self.opt_type = QLineEdit()
+
+        layout.addWidget(QLabel("Initial Stock Price (S0):"))
+        layout.addWidget(self.s0)
+        layout.addWidget(QLabel("Strike Price (K):"))
+        layout.addWidget(self.k)
+        layout.addWidget(QLabel("Time to Maturity (T):"))
+        layout.addWidget(self.t)
+        layout.addWidget(QLabel("Risk-Free Rate (r):"))
+        layout.addWidget(self.r)
+        layout.addWidget(QLabel("Volatility (σ):"))
+        layout.addWidget(self.sigma)
+        layout.addWidget(QLabel("Option Type (call/put):"))
+        layout.addWidget(self.opt_type)
+
+        btn1 = QPushButton("Simulate Delta Hedging")
+        btn2 = QPushButton("Simulate Covered Call")
+
+        btn1.clicked.connect(self.run_delta_hedge)
+        btn2.clicked.connect(self.run_covered_call)
+
+        layout.addWidget(btn1)
+        layout.addWidget(btn2)
+        self.setLayout(layout)
+
+    def run_delta_hedge(self):
+        try:
+            simulate_delta_hedging(
+                float(self.s0.text()),
+                float(self.k.text()),
+                float(self.t.text()),
+                float(self.r.text()),
+                float(self.sigma.text()),
+                self.opt_type.text().strip().lower()
+            )
+        except Exception as e:
+            QMessageBox.warning(self, "Error", str(e))
+
+    def run_covered_call(self):
+        try:
+            simulate_covered_call(
+                float(self.s0.text()),
+                float(self.k.text()),
+                float(self.t.text()),
+                float(self.r.text()),
+                float(self.sigma.text())
+            )
+        except Exception as e:
+            QMessageBox.warning(self, "Error", str(e))
 
 
 class BinomialPricingTab(QWidget):
@@ -655,6 +799,10 @@ class FinanceApp(QWidget):
         tabs.addTab(AdvancedPricingTab(), "Advanced Pricing")
         tabs.addTab(ExoticOptionTab(), "Exotic Options")
         tabs.addTab(BinomialPricingTab(), "Binomial Pricing")
+        tabs.addTab(SimpleInterestTab(), "Simple Interest")
+        tabs.addTab(GreeksEvolutionTab(), "Greeks vs Time")
+        tabs.addTab(SurfacePlotTab(), "Delta/Gamma Surfaces")
+        tabs.addTab(HedgingSimTab(), "Hedging Simulation")
 
         layout = QVBoxLayout()
         layout.addWidget(tabs)
