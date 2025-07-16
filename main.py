@@ -6,6 +6,8 @@ from pricing.binomial_tree import binomial_tree_option_price
 from pricing.pde_solver import crank_nicolson_option_price
 from pricing.exotic_options import asian_option_price, digital_option_price
 from pricing.binomial_tree_extended import one_step_binomial_call, multi_step_binomial_call
+from plotting import plot_greeks_vs_time, plot_delta_gamma_surface
+from hedging_sim import simulate_delta_hedging, simulate_covered_call
 
 
 def main_menu():
@@ -27,6 +29,10 @@ def main_menu():
     print("15. One-Step Binomial Call Option")
     print("16. Multi-Step Binomial Call Option")
     print("17. Hedging Calculations (Delta, Gamma, Theta, Vega)")
+    print("18. Plot Greeks Evolution Over Time")
+    print("19. Plot Delta/Gamma Surfaces")
+    print("20. Simulate Delta Hedging Strategy")
+    print("21. Simulate Covered Call Strategy")
     print("0. Exit")
 
 
@@ -263,6 +269,40 @@ def run_hedging():
     print(f"Theta hedge: {theta_vega['theta_hedge']} contracts of hedge option")
     print(f"Vega hedge: {theta_vega['vega_hedge']} contracts of hedge option")
 
+def run_plot_greeks_time():
+    S = get_float("Stock price (S): ")
+    K = get_float("Strike price (K): ")
+    r = get_float("Risk-free rate (decimal): ")
+    sigma = get_float("Volatility (decimal): ")
+    option_type = input("Option type ('call' or 'put'): ").strip().lower()
+    T_max = get_float("Max time to maturity (years, e.g., 1): ")
+    plot_greeks_vs_time(S, K, r, sigma, option_type, T_max)
+
+def run_plot_greeks_surface():
+    K = get_float("Strike price (K): ")
+    r = get_float("Risk-free rate (decimal): ")
+    sigma = get_float("Volatility (decimal): ")
+    option_type = input("Option type ('call' or 'put'): ").strip().lower()
+    plot_delta_gamma_surface(K, r, sigma, option_type)
+
+def run_simulate_delta_hedging():
+    S0 = get_float("Initial stock price (S0): ")
+    K = get_float("Strike price (K): ")
+    T = get_float("Time to maturity (years): ")
+    r = get_float("Risk-free rate (decimal): ")
+    sigma = get_float("Volatility (decimal): ")
+    option_type = input("Option type ('call' or 'put'): ").strip().lower()
+    simulate_delta_hedging(S0, K, T, r, sigma, option_type)
+
+
+def run_simulate_covered_call():
+    S0 = get_float("Initial stock price (S0): ")
+    K = get_float("Strike price (K): ")
+    T = get_float("Time to maturity (years): ")
+    r = get_float("Risk-free rate (decimal): ")
+    sigma = get_float("Volatility (decimal): ")
+    simulate_covered_call(S0, K, T, r, sigma)
+
 
 def main():
     while True:
@@ -302,6 +342,14 @@ def main():
             run_multi_step_binomial()
         elif choice == '17':
             run_hedging()
+        elif choice == '18':
+            run_plot_greeks_time()
+        elif choice == '19':
+            run_plot_greeks_surface()
+        elif choice == '20':
+            run_simulate_delta_hedging()
+        elif choice == '21':
+            run_simulate_covered_call()    
         elif choice == '0':
             print("Exiting...")
             break
