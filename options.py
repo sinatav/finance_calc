@@ -4,6 +4,25 @@ import matplotlib.pyplot as plt
 
 
 class Option:
+    """
+    Black-Scholes European Option Pricing Model.
+
+    Call price:  C = S N(d1) - K e^{-rT} N(d2)
+    Put price:   P = K e^{-rT} N(-d2) - S N(-d1)
+
+    where:
+        d1 = [ln(S/K) + (r + σ²/2) T] / (σ sqrt(T))
+        d2 = d1 - σ sqrt(T)
+
+    S: Current stock price
+    K: Strike price
+    T: Time to expiration (years)
+    r: Risk-free interest rate
+    sigma: Volatility (std dev)
+    N(): CDF of standard normal distribution
+    """
+    ...
+
     def __init__(self, S, K, T, r, sigma, option_type='call'):
         self.S = S              # Stock price
         self.K = K              # Strike price
