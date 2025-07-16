@@ -1,6 +1,10 @@
 from interests import SimpleInterest, CompoundInterest, ContinuousCompounding
 from bonds import ZeroCouponBond, CouponBearingBond
 from options import Option, plot_greeks_vs_price
+from pricing.monte_carlo import monte_carlo_option_price
+from pricing.binomial_tree import binomial_tree_option_price
+from pricing.pde_solver import crank_nicolson_option_price
+
 
 
 def main_menu():
@@ -14,6 +18,9 @@ def main_menu():
     print("7. Coupon-Bearing Bond YTM (Continuous Compounding)")
     print("8. Black-Scholes Option Pricing & Greeks")
     print("9. Plot Option Greeks vs Stock Price")
+    print("10. Monte Carlo Option Pricing")
+    print("11. Binomial Tree Option Pricing")
+    print("12. Crank-Nicolson PDE Option Pricing")
     print("0. Exit")
 
 
@@ -114,6 +121,7 @@ def run_option_pricing():
     except ValueError as e:
         print(f"Error: {e}")
 
+
 def run_option_plot():
     print("Enter parameters for plotting Option Greeks:")
     K = get_float("Strike price (K): ")
@@ -126,6 +134,46 @@ def run_option_plot():
     step = get_float("Step size: ")
 
     plot_greeks_vs_price(K, T, r, sigma, option_type, S_range=(s_min, s_max), step=step)
+
+
+def run_monte_carlo():
+    S = get_float("Stock price (S): ")
+    K = get_float("Strike price (K): ")
+    T = get_float("Time to maturity (years): ")
+    r = get_float("Risk-free rate (decimal): ")
+    sigma = get_float("Volatility (decimal): ")
+    option_type = input("Option type ('call' or 'put'): ").strip().lower()
+    sims = int(get_float("Number of simulations (e.g., 100000): "))
+
+    price = monte_carlo_option_price(S, K, T, r, sigma, option_type, sims)
+    print(f"Monte Carlo Estimated {option_type.capitalize()} Option Price: ${price:.4f}")
+
+
+def run_binomial_tree():
+    S = get_float("Stock price (S): ")
+    K = get_float("Strike price (K): ")
+    T = get_float("Time to maturity (years): ")
+    r = get_float("Risk-free rate (decimal): ")
+    sigma = get_float("Volatility (decimal): ")
+    steps = int(get_float("Number of steps (e.g., 100): "))
+    option_type = input("Option type ('call' or 'put'): ").strip().lower()
+    is_american = input("Is it an American option? (y/n): ").strip().lower() == 'y'
+
+    price = binomial_tree_option_price(S, K, T, r, sigma, steps, option_type, is_american)
+    print(f"Binomial Tree {option_type.capitalize()} Option Price: ${price:.4f}")
+
+
+def run_crank_nicolson():
+    S = get_float("Stock price (S): ")
+    K = get_float("Strike price (K): ")
+    T = get_float("Time to maturity (years): ")
+    r = get_float("Risk-free rate (decimal): ")
+    sigma = get_float("Volatility (decimal): ")
+    option_type = input("Option type ('call' or 'put'): ").strip().lower()
+
+    price = crank_nicolson_option_price(S, K, T, r, sigma, option_type=option_type)
+    print(f"Crank-Nicolson {option_type.capitalize()} Option Price: ${price:.4f}")
+
 
 
 def main():
@@ -150,6 +198,12 @@ def main():
             run_option_pricing()
         elif choice == '9':
             run_option_plot()
+        elif choice == '10':
+            run_monte_carlo()
+        elif choice == '11':
+            run_binomial_tree()
+        elif choice == '12':
+            run_crank_nicolson()
         elif choice == '0':
             print("Exiting...")
             break
