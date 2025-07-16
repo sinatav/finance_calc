@@ -26,6 +26,7 @@ def main_menu():
     print("14. Digital Option Pricing (Monte Carlo)")
     print("15. One-Step Binomial Call Option")
     print("16. Multi-Step Binomial Call Option")
+    print("17. Hedging Calculations (Delta, Gamma, Theta, Vega)")
     print("0. Exit")
 
 
@@ -232,6 +233,37 @@ def run_multi_step_binomial():
     print(f"Multi-Step Binomial Call Option Price: {price:.4f}")
 
 
+def run_hedging():
+    print("Base Option Parameters:")
+    S = get_float("Stock price (S): ")
+    K = get_float("Strike price (K): ")
+    T = get_float("Time to maturity (years): ")
+    r = get_float("Risk-free rate (decimal): ")
+    sigma = get_float("Volatility (decimal): ")
+    option_type = input("Option type ('call' or 'put'): ").strip().lower()
+    base_opt = Option(S, K, T, r, sigma, option_type)
+
+    print("\nHedge Option Parameters:")
+    S_h = get_float("Stock price (S): ")
+    K_h = get_float("Strike price (K): ")
+    T_h = get_float("Time to maturity (years): ")
+    r_h = get_float("Risk-free rate (decimal): ")
+    sigma_h = get_float("Volatility (decimal): ")
+    option_type_h = input("Option type ('call' or 'put'): ").strip().lower()
+    hedge_opt = Option(S_h, K_h, T_h, r_h, sigma_h, option_type_h)
+
+    target_exp = int(get_float("Number of base option contracts to hedge: "))
+
+    shares = base_opt.delta_hedge_shares(target_exp)
+    gamma_contracts = base_opt.gamma_hedge_options(hedge_opt, target_exp)
+    theta_vega = base_opt.theta_vega_positioning(hedge_opt, target_exp)
+
+    print(f"\nDelta hedge: {shares:.4f} shares of underlying")
+    print(f"Gamma hedge: {gamma_contracts:.4f} contracts of hedge option")
+    print(f"Theta hedge: {theta_vega['theta_hedge']} contracts of hedge option")
+    print(f"Vega hedge: {theta_vega['vega_hedge']} contracts of hedge option")
+
+
 def main():
     while True:
         main_menu()
@@ -268,6 +300,8 @@ def main():
             run_one_step_binomial()
         elif choice == '16':
             run_multi_step_binomial()
+        elif choice == '17':
+            run_hedging()
         elif choice == '0':
             print("Exiting...")
             break
