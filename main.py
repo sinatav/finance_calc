@@ -5,6 +5,7 @@ from pricing.monte_carlo import monte_carlo_option_price
 from pricing.binomial_tree import binomial_tree_option_price
 from pricing.pde_solver import crank_nicolson_option_price
 from pricing.exotic_options import asian_option_price, digital_option_price
+from pricing.binomial_tree_extended import one_step_binomial_call, multi_step_binomial_call
 
 
 def main_menu():
@@ -23,6 +24,8 @@ def main_menu():
     print("12. Crank-Nicolson PDE Option Pricing")
     print("13. Asian Option Pricing (Monte Carlo)")
     print("14. Digital Option Pricing (Monte Carlo)")
+    print("15. One-Step Binomial Call Option")
+    print("16. Multi-Step Binomial Call Option")
     print("0. Exit")
 
 
@@ -203,6 +206,31 @@ def run_digital_option():
     price = digital_option_price(S, K, T, r, sigma, option_type, sims)
     print(f"Digital {option_type.capitalize()} Option Price: ${price:.4f}")
 
+def run_one_step_binomial():
+    S = get_float("Current stock price (S): ")
+    K = get_float("Strike price (K): ")
+    u = get_float("Up factor (u): ")
+    d = get_float("Down factor (d): ")
+    r = get_float("Risk-free rate (decimal): ")
+
+    result = one_step_binomial_call(S, K, u, d, r)
+    print(f"Risk-neutral probability (p): {result['p']:.4f}")
+    print(f"Call Value if Up (Cu): {result['Cu']:.4f}")
+    print(f"Call Value if Down (Cd): {result['Cd']:.4f}")
+    print(f"Current Call Price: {result['Call Price']:.4f}")
+
+
+def run_multi_step_binomial():
+    S = get_float("Current stock price (S): ")
+    K = get_float("Strike price (K): ")
+    T = get_float("Time to maturity (in years): ")
+    r = get_float("Risk-free rate (decimal): ")
+    sigma = get_float("Volatility (sigma): ")
+    N = int(get_float("Number of steps (N): "))
+
+    price = multi_step_binomial_call(S, K, T, r, sigma, N)
+    print(f"Multi-Step Binomial Call Option Price: {price:.4f}")
+
 
 def main():
     while True:
@@ -236,6 +264,10 @@ def main():
             run_asian_option()
         elif choice == '14':
             run_digital_option()
+        elif choice == '15':
+            run_one_step_binomial()
+        elif choice == '16':
+            run_multi_step_binomial()
         elif choice == '0':
             print("Exiting...")
             break
