@@ -475,6 +475,7 @@ class FinanceApp(QWidget):
         tabs.addTab(CouponBearingBondTab(), "Coupon-Bearing Bond")
         tabs.addTab(OptionPricingTab(), "Option Pricing")
         tabs.addTab(OptionPlotTab(), "Option Greeks Plot")
+        tabs.addTab(AdvancedPricingTab(), "Advanced Pricing")
 
         layout = QVBoxLayout()
         layout.addWidget(tabs)
