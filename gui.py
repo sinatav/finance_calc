@@ -16,6 +16,86 @@ from PySide6.QtWidgets import (
 from pricing.monte_carlo import monte_carlo_option_price
 from pricing.binomial_tree import binomial_tree_option_price
 from pricing.pde_solver import crank_nicolson_option_price
+from PySide6.QtWidgets import (
+    QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QComboBox, QMessageBox
+)
+from pricing.exotic_options import asian_option_price, digital_option_price
+
+
+class ExoticOptionTab(QWidget):
+    def __init__(self):
+        super().__init__()
+        layout = QVBoxLayout()
+
+        self.S_input = QLineEdit()
+        self.K_input = QLineEdit()
+        self.T_input = QLineEdit()
+        self.r_input = QLineEdit()
+        self.sigma_input = QLineEdit()
+        self.steps_input = QLineEdit()
+        self.sims_input = QLineEdit()
+
+        self.option_type_box = QComboBox()
+        self.option_type_box.addItems(["call", "put"])
+
+        self.exotic_type_box = QComboBox()
+        self.exotic_type_box.addItems(["Asian", "Digital"])
+
+        button = QPushButton("Calculate Exotic Option Price")
+        button.clicked.connect(self.calculate)
+
+        layout.addWidget(QLabel("Stock Price (S):"))
+        layout.addWidget(self.S_input)
+
+        layout.addWidget(QLabel("Strike Price (K):"))
+        layout.addWidget(self.K_input)
+
+        layout.addWidget(QLabel("Time to Maturity (T in years):"))
+        layout.addWidget(self.T_input)
+
+        layout.addWidget(QLabel("Risk-Free Rate (r):"))
+        layout.addWidget(self.r_input)
+
+        layout.addWidget(QLabel("Volatility (sigma):"))
+        layout.addWidget(self.sigma_input)
+
+        layout.addWidget(QLabel("Number of Simulations:"))
+        layout.addWidget(self.sims_input)
+
+        layout.addWidget(QLabel("Steps per Path (only for Asian):"))
+        layout.addWidget(self.steps_input)
+
+        layout.addWidget(QLabel("Option Type:"))
+        layout.addWidget(self.option_type_box)
+
+        layout.addWidget(QLabel("Exotic Option Type:"))
+        layout.addWidget(self.exotic_type_box)
+
+        layout.addWidget(button)
+        self.setLayout(layout)
+
+    def calculate(self):
+        try:
+            S = float(self.S_input.text())
+            K = float(self.K_input.text())
+            T = float(self.T_input.text())
+            r = float(self.r_input.text())
+            sigma = float(self.sigma_input.text())
+            sims = int(self.sims_input.text())
+            option_type = self.option_type_box.currentText()
+            exotic_type = self.exotic_type_box.currentText()
+
+            if exotic_type == "Asian":
+                steps = int(self.steps_input.text())
+                price = asian_option_price(S, K, T, r, sigma, option_type, sims, steps)
+            elif exotic_type == "Digital":
+                price = digital_option_price(S, K, T, r, sigma, option_type, sims)
+            else:
+                raise ValueError("Invalid exotic option type.")
+
+            QMessageBox.information(self, "Result", f"{exotic_type} {option_type.capitalize()} Option Price: ${price:.4f}")
+        except Exception as e:
+            QMessageBox.warning(self, "Error", str(e))
 
 
 class AdvancedPricingTab(QWidget):
@@ -476,6 +556,7 @@ class FinanceApp(QWidget):
         tabs.addTab(OptionPricingTab(), "Option Pricing")
         tabs.addTab(OptionPlotTab(), "Option Greeks Plot")
         tabs.addTab(AdvancedPricingTab(), "Advanced Pricing")
+        tabs.addTab(ExoticOptionTab(), "Exotic Options")
 
         layout = QVBoxLayout()
         layout.addWidget(tabs)
