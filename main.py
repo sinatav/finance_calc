@@ -4,7 +4,7 @@ from options import Option, plot_greeks_vs_price
 from pricing.monte_carlo import monte_carlo_option_price
 from pricing.binomial_tree import binomial_tree_option_price
 from pricing.pde_solver import crank_nicolson_option_price
-
+from pricing.exotic_options import asian_option_price, digital_option_price
 
 
 def main_menu():
@@ -21,6 +21,8 @@ def main_menu():
     print("10. Monte Carlo Option Pricing")
     print("11. Binomial Tree Option Pricing")
     print("12. Crank-Nicolson PDE Option Pricing")
+    print("13. Asian Option Pricing (Monte Carlo)")
+    print("14. Digital Option Pricing (Monte Carlo)")
     print("0. Exit")
 
 
@@ -175,6 +177,32 @@ def run_crank_nicolson():
     print(f"Crank-Nicolson {option_type.capitalize()} Option Price: ${price:.4f}")
 
 
+def run_asian_option():
+    S = get_float("Stock price (S): ")
+    K = get_float("Strike price (K): ")
+    T = get_float("Time to maturity (years): ")
+    r = get_float("Risk-free rate (decimal): ")
+    sigma = get_float("Volatility (decimal): ")
+    steps = int(get_float("Steps per path (e.g. 100): "))
+    sims = int(get_float("Number of simulations (e.g. 100000): "))
+    option_type = input("Option type ('call' or 'put'): ").strip().lower()
+
+    price = asian_option_price(S, K, T, r, sigma, option_type, sims, steps)
+    print(f"Asian {option_type.capitalize()} Option Price: ${price:.4f}")
+
+
+def run_digital_option():
+    S = get_float("Stock price (S): ")
+    K = get_float("Strike price (K): ")
+    T = get_float("Time to maturity (years): ")
+    r = get_float("Risk-free rate (decimal): ")
+    sigma = get_float("Volatility (decimal): ")
+    sims = int(get_float("Number of simulations (e.g. 100000): "))
+    option_type = input("Option type ('call' or 'put'): ").strip().lower()
+
+    price = digital_option_price(S, K, T, r, sigma, option_type, sims)
+    print(f"Digital {option_type.capitalize()} Option Price: ${price:.4f}")
+
 
 def main():
     while True:
@@ -204,6 +232,10 @@ def main():
             run_binomial_tree()
         elif choice == '12':
             run_crank_nicolson()
+        elif choice == '13':
+            run_asian_option()
+        elif choice == '14':
+            run_digital_option()
         elif choice == '0':
             print("Exiting...")
             break
