@@ -11,6 +11,7 @@ from plotting import plot_greeks_vs_time, plot_delta_gamma_surface
 from hedging_sim import simulate_delta_hedging, simulate_covered_call
 from risk.var_cvar import compute_var_cvar, visualize_var_cvar
 from risk.stress_test import StressTestSimulator
+from portfolio.expected_return import expected_portfolio_return
 
 
 def main_menu():
@@ -38,6 +39,7 @@ def main_menu():
     print("21. Simulate Covered Call Strategy")
     print("22. Risk Analysis (VaR / CVaR)")
     print("23. Run Stress Test Simulation")
+    print("24. Calculate Expected Portfolio Return")
     print("0. Exit")
 
 
@@ -333,6 +335,16 @@ def run_stress_test_simulation():
     simulator.plot_shock_effects(shocks)
 
 
+def run_expected_return_simple():
+    print("Enter the weights of assets (comma-separated, e.g., 0.5,0.3,0.2):")
+    weights = list(map(float, input().split(',')))
+    print("Enter the expected returns for each asset (comma-separated, e.g., 0.08,0.05,0.12):")
+    expected_returns = list(map(float, input().split(',')))
+    result = expected_portfolio_return(weights, expected_returns)
+    print(f"Expected Portfolio Return: {result:.4f}")
+
+
+
 def main():
     while True:
         main_menu()
@@ -381,8 +393,10 @@ def main():
             run_simulate_covered_call()
         elif choice == "22":
             risk_analysis_menu()
-        elif choice == "16":
+        elif choice == "23":
             run_stress_test_simulation()
+        elif choice == "24":
+            run_expected_return_simple()
         elif choice == '0':
             print("Exiting...")
             break
