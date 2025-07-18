@@ -17,6 +17,11 @@ from portfolio.portfolio_variance import portfolio_variance
 from portfolio.capital_market_line import capital_market_line
 from portfolio.capm import capital_asset_pricing_model
 from portfolio.beta import calculate_beta
+from portfolio.sharpe_ratio import sharpe_ratio
+from portfolio.efficient_frontier import plot_efficient_frontier
+from risk.var import parametric_var
+from risk.cvar import conditional_var
+
 
 
 def main_menu():
@@ -49,6 +54,10 @@ def main_menu():
     print("26. Calculate Capital Market Line (CML) Return")
     print("27. Calculate Expected Return using CAPM")
     print("28. Calculate Beta of an asset")
+    print("29. Calculate Sharpe Ratio")
+    print("30. Plot Efficient Frontier")
+    print("31. Calculate Basic Parametric VaR")
+    print("32. Calculate Conditional VaR (CVaR)")
     print("0. Exit")
 
 
@@ -392,6 +401,56 @@ def calc_beta():
     print(f"Beta (β) of the asset: {beta:.6f}")
 
 
+def cli_sharpe_ratio():
+    print("\n--- Sharpe Ratio Calculation ---")
+    expected_return = float(input("Enter expected portfolio return (decimal, e.g. 0.1 for 10%): "))
+    risk_free_rate = float(input("Enter risk-free rate (decimal, e.g. 0.02 for 2%): "))
+    portfolio_std_dev = float(input("Enter portfolio standard deviation (risk): "))
+
+    sharpe = sharpe_ratio(expected_return, risk_free_rate, portfolio_std_dev)
+    print(f"Sharpe Ratio: {sharpe:.4f}")
+
+
+def cli_efficient_frontier():
+    print("\n--- Efficient Frontier Plot ---")
+    n = int(input("Enter number of assets in portfolio: "))
+    returns = []
+    print("Enter expected returns of each asset (decimal):")
+    for i in range(n):
+        r = float(input(f"Asset {i+1}: "))
+        returns.append(r)
+
+    print("Enter covariance matrix (each row as space-separated decimals):")
+    cov_matrix = []
+    for i in range(n):
+        row = list(map(float, input(f"Row {i+1}: ").split()))
+        if len(row) != n:
+            print("Invalid row length. Aborting.")
+            return
+        cov_matrix.append(row)
+
+    plot_efficient_frontier(returns, cov_matrix)
+    print("Plot generated successfully.")
+
+
+def cli_parametric_var():
+    print("\n--- Basic Parametric VaR ---")
+    returns = list(map(float, input("Enter portfolio returns as space-separated decimals: ").split()))
+    confidence_level = float(input("Enter confidence level (e.g., 0.95): "))
+
+    var = parametric_var(returns, confidence_level)
+    print(f"Parametric VaR at {confidence_level*100:.2f}% confidence: {var:.4f}")
+
+
+def cli_conditional_var():
+    print("\n--- Conditional VaR (CVaR) ---")
+    returns = list(map(float, input("Enter portfolio returns as space-separated decimals: ").split()))
+    confidence_level = float(input("Enter confidence level (e.g., 0.95): "))
+
+    cvar = conditional_var(returns, confidence_level)
+    print(f"Conditional VaR (Expected Shortfall) at {confidence_level*100:.2f}% confidence: {cvar:.4f}")
+
+
 def main():
     while True:
         main_menu()
@@ -452,6 +511,14 @@ def main():
             calc_capm()
         elif choice == "28":
             calc_beta()
+        elif choice == "29":
+            cli_sharpe_ratio()
+        elif choice == "30":
+            cli_efficient_frontier()
+        elif choice == "31":
+            cli_parametric_var()
+        elif choice == "32":
+            cli_conditional_var()
         elif choice == '0':
             print("Exiting...")
             break
