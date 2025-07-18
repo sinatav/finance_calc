@@ -13,6 +13,7 @@ from risk.var_cvar import compute_var_cvar, visualize_var_cvar
 from risk.stress_test import StressTestSimulator
 from portfolio.expected_return import expected_portfolio_return
 from portfolio.portfolio_variance import portfolio_variance
+from portfolio.capital_market_line import capital_market_line
 
 
 def main_menu():
@@ -42,6 +43,7 @@ def main_menu():
     print("23. Run Stress Test Simulation")
     print("24. Calculate Expected Portfolio Return")
     print("25. Calculate Portfolio Variance")
+    print("26. Calculate Capital Market Line (CML) Return")
     print("0. Exit")
 
 
@@ -356,6 +358,15 @@ def calc_portfolio_variance():
     print(f"Portfolio Variance: {result:.6f}")
 
 
+def calc_cml():
+    rf = float(input("Enter risk-free rate (Rf): "))
+    rm = float(input("Enter expected market return (Rm): "))
+    sigma_m = float(input("Enter market standard deviation (σm): "))
+    sigma_c = float(input("Enter your portfolio standard deviation (σc): "))
+    result = capital_market_line(rf, rm, sigma_m, sigma_c)
+    print(f"Expected Return on CML: {result:.6f}")
+
+
 def main():
     while True:
         main_menu()
@@ -410,6 +421,8 @@ def main():
             run_expected_return_simple()
         elif choice == "25":
             calc_portfolio_variance()
+        elif choice == "26":
+            calc_cml()
         elif choice == '0':
             print("Exiting...")
             break
