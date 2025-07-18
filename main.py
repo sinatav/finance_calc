@@ -25,6 +25,12 @@ from risk.scaling_var import scale_var
 from time_series.moving_average import moving_average, exponential_moving_average
 from time_series.ar_model import autoregressive_model
 from time_series.arima_model import fit_arima
+from models.scaling_var import scale_var
+from models.moving_average import calculate_sma, calculate_ema
+from models.ar_model import fit_ar_model
+from models.ma_model import fit_ma_model
+from models.arima_model import fit_arima_model
+from models_menu import ui
 
 
 
@@ -67,6 +73,7 @@ def main_menu():
     print("35. Calculate Exponential Moving Average (EMA)")
     print("36. Autoregressive (AR) Model Prediction")
     print("37. Fit ARIMA Model")
+    print("38. Enter Models' Menu")
     print("0. Exit")
 
 
@@ -581,6 +588,8 @@ def main():
             cli_ar_model()
         elif choice == "37":
             cli_arima_model()
+        elif choice == "38":
+            ui()
         elif choice == '0':
             print("Exiting...")
             break
