@@ -21,6 +21,10 @@ from portfolio.sharpe_ratio import sharpe_ratio
 from portfolio.efficient_frontier import plot_efficient_frontier
 from risk.var import parametric_var
 from risk.cvar import conditional_var
+from risk.scaling_var import scale_var
+from time_series.moving_average import moving_average, exponential_moving_average
+from time_series.ar_model import autoregressive_model
+from time_series.arima_model import fit_arima
 
 
 
@@ -58,6 +62,11 @@ def main_menu():
     print("30. Plot Efficient Frontier")
     print("31. Calculate Basic Parametric VaR")
     print("32. Calculate Conditional VaR (CVaR)")
+    print("33. Scale VaR for Multiple Days")
+    print("34. Calculate Moving Average (MA)")
+    print("35. Calculate Exponential Moving Average (EMA)")
+    print("36. Autoregressive (AR) Model Prediction")
+    print("37. Fit ARIMA Model")
     print("0. Exit")
 
 
@@ -451,6 +460,49 @@ def cli_conditional_var():
     print(f"Conditional VaR (Expected Shortfall) at {confidence_level*100:.2f}% confidence: {cvar:.4f}")
 
 
+def cli_scale_var():
+    print("\n--- VaR Scaling ---")
+    var_1day = float(input("Enter 1-day VaR: "))
+    days = int(input("Enter number of days to scale to: "))
+    var_t = scale_var(var_1day, days)
+    print(f"Scaled VaR for {days} days: {var_t:.4f}")
+
+def cli_moving_average():
+    print("\n--- Moving Average (MA) ---")
+    data = list(map(float, input("Enter data points separated by space: ").split()))
+    window = int(input("Enter window size: "))
+    ma = moving_average(data, window)
+    print(f"Moving Average (last values): {ma[-5:]}")  # show last 5 for brevity
+
+def cli_exponential_moving_average():
+    print("\n--- Exponential Moving Average (EMA) ---")
+    data = list(map(float, input("Enter data points separated by space: ").split()))
+    alpha = float(input("Enter smoothing factor alpha (0 < alpha < 1): "))
+    ema = exponential_moving_average(data, alpha)
+    print(f"EMA (last values): {ema[-5:]}")
+
+def cli_ar_model():
+    print("\n--- Autoregressive (AR) Model ---")
+    data = list(map(float, input("Enter data points separated by space: ").split()))
+    p = int(input("Enter order p of AR model: "))
+    coeffs = []
+    for i in range(p):
+        c = float(input(f"Enter AR coefficient phi_{i+1}: "))
+        coeffs.append(c)
+    c0 = float(input("Enter constant term c: "))
+    pred = autoregressive_model(data, coeffs, c0)
+    print(f"AR Model Predictions (last 5): {pred[-5:]}")
+
+def cli_arima_model():
+    print("\n--- ARIMA Model Fit ---")
+    data = list(map(float, input("Enter data points separated by space: ").split()))
+    p = int(input("Enter AR order p: "))
+    d = int(input("Enter degree of differencing d: "))
+    q = int(input("Enter MA order q: "))
+    model_fit = fit_arima(data, (p, d, q))
+    print(model_fit.summary())
+
+
 def main():
     while True:
         main_menu()
@@ -519,6 +571,16 @@ def main():
             cli_parametric_var()
         elif choice == "32":
             cli_conditional_var()
+        elif choice == "33":
+            cli_scale_var()
+        elif choice == "34":
+            cli_moving_average()
+        elif choice == "35":
+            cli_exponential_moving_average()
+        elif choice == "36":
+            cli_ar_model()
+        elif choice == "37":
+            cli_arima_model()
         elif choice == '0':
             print("Exiting...")
             break
