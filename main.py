@@ -12,6 +12,7 @@ from hedging_sim import simulate_delta_hedging, simulate_covered_call
 from risk.var_cvar import compute_var_cvar, visualize_var_cvar
 from risk.stress_test import StressTestSimulator
 from portfolio.expected_return import expected_portfolio_return
+from portfolio.portfolio_variance import portfolio_variance
 
 
 def main_menu():
@@ -40,6 +41,7 @@ def main_menu():
     print("22. Risk Analysis (VaR / CVaR)")
     print("23. Run Stress Test Simulation")
     print("24. Calculate Expected Portfolio Return")
+    print("25. Calculate Portfolio Variance")
     print("0. Exit")
 
 
@@ -344,6 +346,15 @@ def run_expected_return_simple():
     print(f"Expected Portfolio Return: {result:.4f}")
 
 
+def calc_portfolio_variance():
+    print("Enter weights (comma-separated, e.g., 0.5,0.5):")
+    weights = list(map(float, input().split(',')))
+    print("Enter the covariance matrix (e.g., for 2 assets: 0.01,0.002;0.002,0.02):")
+    rows = input().split(';')
+    covariance_matrix = [list(map(float, row.split(','))) for row in rows]
+    result = portfolio_variance(weights, covariance_matrix)
+    print(f"Portfolio Variance: {result:.6f}")
+
 
 def main():
     while True:
@@ -397,6 +408,8 @@ def main():
             run_stress_test_simulation()
         elif choice == "24":
             run_expected_return_simple()
+        elif choice == "25":
+            calc_portfolio_variance()
         elif choice == '0':
             print("Exiting...")
             break
