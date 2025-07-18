@@ -31,6 +31,10 @@ from models.ar_model import fit_ar_model
 from models.ma_model import fit_ma_model
 from models.arima_model import fit_arima_model
 from models_menu import ui
+from forecasting.kalman_filter import run_kalman_filter_
+from forecasting.random_forest import run_random_forest_model
+from forecasting.neural_network import run_neural_network_model
+from forecasting.garch_model import run_garch_forecasting
 
 
 
@@ -74,6 +78,10 @@ def main_menu():
     print("36. Autoregressive (AR) Model Prediction")
     print("37. Fit ARIMA Model")
     print("38. Enter Models' Menu")
+    print("39. Kalman Filter (Recursive Estimation)")
+    print("40. Random Forest Model (Machine Learning)")
+    print("41. Neural Network Model (Machine Learning)")
+    print("42. GARCH Model (Volatility Forecasting)")
     print("0. Exit")
 
 
@@ -474,6 +482,7 @@ def cli_scale_var():
     var_t = scale_var(var_1day, days)
     print(f"Scaled VaR for {days} days: {var_t:.4f}")
 
+
 def cli_moving_average():
     print("\n--- Moving Average (MA) ---")
     data = list(map(float, input("Enter data points separated by space: ").split()))
@@ -481,12 +490,14 @@ def cli_moving_average():
     ma = moving_average(data, window)
     print(f"Moving Average (last values): {ma[-5:]}")  # show last 5 for brevity
 
+
 def cli_exponential_moving_average():
     print("\n--- Exponential Moving Average (EMA) ---")
     data = list(map(float, input("Enter data points separated by space: ").split()))
     alpha = float(input("Enter smoothing factor alpha (0 < alpha < 1): "))
     ema = exponential_moving_average(data, alpha)
     print(f"EMA (last values): {ema[-5:]}")
+
 
 def cli_ar_model():
     print("\n--- Autoregressive (AR) Model ---")
@@ -500,6 +511,7 @@ def cli_ar_model():
     pred = autoregressive_model(data, coeffs, c0)
     print(f"AR Model Predictions (last 5): {pred[-5:]}")
 
+
 def cli_arima_model():
     print("\n--- ARIMA Model Fit ---")
     data = list(map(float, input("Enter data points separated by space: ").split()))
@@ -508,6 +520,41 @@ def cli_arima_model():
     q = int(input("Enter MA order q: "))
     model_fit = fit_arima(data, (p, d, q))
     print(model_fit.summary())
+
+
+def run_kalman_filter():
+    print("Kalman Filter (Recursive Estimation)")
+    try:
+        data_path = input("Enter path to time series CSV (with a 'value' column): ")
+        run_kalman_filter(data_path)
+    except Exception as e:
+        print(f"[Error] Kalman Filter failed: {e}")
+
+def run_random_forest():
+    print("Random Forest (Classification/Regression)")
+    try:
+        data_path = input("Enter path to CSV file: ")
+        target_column = input("Enter target column name: ")
+        run_random_forest_model(data_path, target_column)
+    except Exception as e:
+        print(f"[Error] Random Forest failed: {e}")
+
+def run_neural_network():
+    print("Neural Network (MLP)")
+    try:
+        data_path = input("Enter path to CSV file: ")
+        target_column = input("Enter target column name: ")
+        run_neural_network_model(data_path, target_column)
+    except Exception as e:
+        print(f"[Error] Neural Network failed: {e}")
+
+def run_garch_model():
+    print("GARCH Model (Volatility Forecasting)")
+    try:
+        data_path = input("Enter path to time series CSV (with a 'returns' column): ")
+        run_garch_forecasting(data_path)
+    except Exception as e:
+        print(f"[Error] GARCH Model failed: {e}")
 
 
 def main():
@@ -590,6 +637,14 @@ def main():
             cli_arima_model()
         elif choice == "38":
             ui()
+        elif choice == 39:
+            run_kalman_filter()
+        elif choice == 40:
+            run_random_forest()
+        elif choice == 41:
+            run_neural_network()
+        elif choice == 42:
+            run_garch_model()
         elif choice == '0':
             print("Exiting...")
             break

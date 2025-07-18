@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from arch import arch_model
 
-def run_garch_model(returns):
+def run_garch_forecasting(returns):
     model = arch_model(returns, vol='Garch', p=1, q=1)
     model_fit = model.fit(disp="off")
     forecast = model_fit.forecast(horizon=5)

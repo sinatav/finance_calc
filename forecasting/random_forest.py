@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 
-def run_random_forest(X, y):
+def run_random_forest_model(X, y):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
     model = RandomForestRegressor(n_estimators=100)
     model.fit(X_train, y_train)
