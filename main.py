@@ -14,6 +14,7 @@ from risk.stress_test import StressTestSimulator
 from portfolio.expected_return import expected_portfolio_return
 from portfolio.portfolio_variance import portfolio_variance
 from portfolio.capital_market_line import capital_market_line
+from portfolio.capm import capital_asset_pricing_model
 
 
 def main_menu():
@@ -44,6 +45,7 @@ def main_menu():
     print("24. Calculate Expected Portfolio Return")
     print("25. Calculate Portfolio Variance")
     print("26. Calculate Capital Market Line (CML) Return")
+    print("27. Calculate Expected Return using CAPM")
     print("0. Exit")
 
 
@@ -367,6 +369,14 @@ def calc_cml():
     print(f"Expected Return on CML: {result:.6f}")
 
 
+def calc_capm():
+    rf = float(input("Enter risk-free rate (Rf): "))
+    beta = float(input("Enter beta of the asset (β): "))
+    rm = float(input("Enter expected market return (Rm): "))
+    result = capital_asset_pricing_model(rf, beta, rm)
+    print(f"Expected Return using CAPM: {result:.6f}")
+
+
 def main():
     while True:
         main_menu()
@@ -423,6 +433,8 @@ def main():
             calc_portfolio_variance()
         elif choice == "26":
             calc_cml()
+        elif choice == "27":
+            calc_capm()
         elif choice == '0':
             print("Exiting...")
             break
