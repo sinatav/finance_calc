@@ -1,3 +1,4 @@
+import numpy as np
 from interests import SimpleInterest, CompoundInterest, ContinuousCompounding
 from bonds import ZeroCouponBond, CouponBearingBond
 from options import Option, plot_greeks_vs_price
@@ -8,6 +9,8 @@ from pricing.exotic_options import asian_option_price, digital_option_price
 from pricing.binomial_tree_extended import one_step_binomial_call, multi_step_binomial_call
 from plotting import plot_greeks_vs_time, plot_delta_gamma_surface
 from hedging_sim import simulate_delta_hedging, simulate_covered_call
+from risk.var_cvar import compute_var_cvar, visualize_var_cvar
+from risk.stress_test import StressTestSimulator
 
 
 def main_menu():
@@ -34,6 +37,7 @@ def main_menu():
     print("20. Simulate Delta Hedging Strategy")
     print("21. Simulate Covered Call Strategy")
     print("22. Risk Analysis (VaR / CVaR)")
+    print("23. Run Stress Test Simulation")
     print("0. Exit")
 
 
@@ -306,9 +310,6 @@ def run_simulate_covered_call():
 
 
 def risk_analysis_menu():
-    import numpy as np
-    from risk.var_cvar import compute_var_cvar, visualize_var_cvar
-
     returns = np.random.normal(0.001, 0.02, 1000)  # Simulated return series
     confidence = float(input("Enter confidence level (e.g. 0.95): ") or 0.95)
     var, cvar = compute_var_cvar(returns, confidence)
@@ -317,6 +318,19 @@ def risk_analysis_menu():
     visualize = input("Visualize histogram and VaR/CVaR? (y/n): ").lower() == 'y'
     if visualize:
         visualize_var_cvar(returns, confidence)
+
+
+def run_stress_test_simulation():
+    returns = np.random.normal(0.001, 0.02, 1000)
+    simulator = StressTestSimulator(returns)
+    shocks = {
+        "Mild": -0.05,
+        "Moderate": -0.15,
+        "Severe": -0.3
+    }
+    result = simulator.run_stress_scenario(shocks)
+    print("\nStress Test Summary:\n", result)
+    simulator.plot_shock_effects(shocks)
 
 
 def main():
@@ -367,6 +381,8 @@ def main():
             run_simulate_covered_call()
         elif choice == "22":
             risk_analysis_menu()
+        elif choice == "16":
+            run_stress_test_simulation()
         elif choice == '0':
             print("Exiting...")
             break
