@@ -1,4 +1,5 @@
 import numpy as np
+import ast
 from interests import SimpleInterest, CompoundInterest, ContinuousCompounding
 from bonds import ZeroCouponBond, CouponBearingBond
 from options import Option, plot_greeks_vs_price
@@ -15,6 +16,7 @@ from portfolio.expected_return import expected_portfolio_return
 from portfolio.portfolio_variance import portfolio_variance
 from portfolio.capital_market_line import capital_market_line
 from portfolio.capm import capital_asset_pricing_model
+from portfolio.beta import calculate_beta
 
 
 def main_menu():
@@ -46,6 +48,7 @@ def main_menu():
     print("25. Calculate Portfolio Variance")
     print("26. Calculate Capital Market Line (CML) Return")
     print("27. Calculate Expected Return using CAPM")
+    print("28. Calculate Beta of an asset")
     print("0. Exit")
 
 
@@ -282,6 +285,7 @@ def run_hedging():
     print(f"Theta hedge: {theta_vega['theta_hedge']} contracts of hedge option")
     print(f"Vega hedge: {theta_vega['vega_hedge']} contracts of hedge option")
 
+
 def run_plot_greeks_time():
     S = get_float("Stock price (S): ")
     K = get_float("Strike price (K): ")
@@ -291,12 +295,14 @@ def run_plot_greeks_time():
     T_max = get_float("Max time to maturity (years, e.g., 1): ")
     plot_greeks_vs_time(S, K, r, sigma, option_type, T_max)
 
+
 def run_plot_greeks_surface():
     K = get_float("Strike price (K): ")
     r = get_float("Risk-free rate (decimal): ")
     sigma = get_float("Volatility (decimal): ")
     option_type = input("Option type ('call' or 'put'): ").strip().lower()
     plot_delta_gamma_surface(K, r, sigma, option_type)
+
 
 def run_simulate_delta_hedging():
     S0 = get_float("Initial stock price (S0): ")
@@ -377,6 +383,15 @@ def calc_capm():
     print(f"Expected Return using CAPM: {result:.6f}")
 
 
+def calc_beta():
+    asset_str = input("Enter asset returns as list (e.g., [0.01, 0.02, -0.005]): ")
+    market_str = input("Enter market returns as list (e.g., [0.015, 0.025, -0.003]): ")
+    asset_returns = ast.literal_eval(asset_str)
+    market_returns = ast.literal_eval(market_str)
+    beta = calculate_beta(asset_returns, market_returns)
+    print(f"Beta (β) of the asset: {beta:.6f}")
+
+
 def main():
     while True:
         main_menu()
@@ -435,6 +450,8 @@ def main():
             calc_cml()
         elif choice == "27":
             calc_capm()
+        elif choice == "28":
+            calc_beta()
         elif choice == '0':
             print("Exiting...")
             break
