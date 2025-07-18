@@ -33,6 +33,7 @@ def main_menu():
     print("19. Plot Delta/Gamma Surfaces")
     print("20. Simulate Delta Hedging Strategy")
     print("21. Simulate Covered Call Strategy")
+    print("22. Risk Analysis (VaR / CVaR)")
     print("0. Exit")
 
 
@@ -304,6 +305,20 @@ def run_simulate_covered_call():
     simulate_covered_call(S0, K, T, r, sigma)
 
 
+def risk_analysis_menu():
+    import numpy as np
+    from risk.var_cvar import compute_var_cvar, visualize_var_cvar
+
+    returns = np.random.normal(0.001, 0.02, 1000)  # Simulated return series
+    confidence = float(input("Enter confidence level (e.g. 0.95): ") or 0.95)
+    var, cvar = compute_var_cvar(returns, confidence)
+    print(f"Value at Risk (VaR): {var:.4f}")
+    print(f"Conditional Value at Risk (CVaR): {cvar:.4f}")
+    visualize = input("Visualize histogram and VaR/CVaR? (y/n): ").lower() == 'y'
+    if visualize:
+        visualize_var_cvar(returns, confidence)
+
+
 def main():
     while True:
         main_menu()
@@ -349,7 +364,9 @@ def main():
         elif choice == '20':
             run_simulate_delta_hedging()
         elif choice == '21':
-            run_simulate_covered_call()    
+            run_simulate_covered_call()
+        elif choice == "22":
+            risk_analysis_menu()
         elif choice == '0':
             print("Exiting...")
             break
