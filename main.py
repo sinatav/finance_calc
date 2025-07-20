@@ -17,7 +17,7 @@ from portfolio.portfolio_variance import portfolio_variance
 from portfolio.capital_market_line import capital_market_line
 from portfolio.capm import capital_asset_pricing_model
 from portfolio.beta import calculate_beta
-from portfolio.sharpe_ratio import sharpe_ratio
+from portfolio.sharpe import sharpe_ratio
 from portfolio.efficient_frontier import plot_efficient_frontier
 from risk.var import parametric_var
 from risk.cvar import conditional_var
