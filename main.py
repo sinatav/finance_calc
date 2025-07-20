@@ -35,6 +35,15 @@ from forecasting.kalman_filter import run_kalman_filter_
 from forecasting.random_forest import run_random_forest_model
 from forecasting.neural_network import run_neural_network_model
 from forecasting.garch_model import run_garch_forecasting
+from models.least_squares import least_squares_regression
+from models.rsquared import r_squared
+from models.nonlinear_regression import polynomial_fit
+from models.time_value_money import (
+    future_value,
+    present_value,
+    annuity_value,
+    perpetuity_value
+)
 
 
 
@@ -82,6 +91,10 @@ def main_menu():
     print("40. Random Forest Model (Machine Learning)")
     print("41. Neural Network Model (Machine Learning)")
     print("42. GARCH Model (Volatility Forecasting)")
+    print("43. Least Squares Regression")
+    print("44. R-squared (Goodness of Fit)")
+    print("45. Nonlinear & Polynomial Regression")
+    print("46. Time Value of Money")
     print("0. Exit")
 
 
@@ -557,6 +570,39 @@ def run_garch_model():
         print(f"[Error] GARCH Model failed: {e}")
 
 
+def run_least_squares():
+    x = np.array([1, 2, 3, 4, 5])
+    y = np.array([2, 4, 5, 4, 5])
+    least_squares_regression(x, y)
+
+
+def run_r_squared():
+    y_true = np.array([1, 2, 3, 4])
+    y_pred = np.array([0.8, 2.1, 2.9, 4.2])
+    r_squared(y_true, y_pred)
+
+
+def run_polynomial_regression():
+    x = np.array([1, 2, 3, 4, 5])
+    y = np.array([1.2, 1.9, 3.0, 4.1, 5.3])
+    polynomial_fit(x, y, degree=2)
+
+
+def run_time_value_money():
+    print("TVM Options:\n1. Future Value\n2. Present Value\n3. Annuity\n4. Perpetuity")
+    sub = input("Enter choice: ")
+    if sub == "1":
+        print("FV =", future_value(1000, 0.05, 5))
+    elif sub == "2":
+        print("PV =", present_value(1276.28, 0.05, 5))
+    elif sub == "3":
+        print("Annuity =", annuity_value(100, 0.05, 10))
+    elif sub == "4":
+        print("Perpetuity =", perpetuity_value(100, 0.05))
+    else:
+        print("Invalid sub-choice.")
+
+
 def main():
     while True:
         main_menu()
@@ -637,14 +683,22 @@ def main():
             cli_arima_model()
         elif choice == "38":
             ui()
-        elif choice == 39:
+        elif choice == "39":
             run_kalman_filter()
-        elif choice == 40:
+        elif choice == "40":
             run_random_forest()
-        elif choice == 41:
+        elif choice == "41":
             run_neural_network()
-        elif choice == 42:
+        elif choice == "42":
             run_garch_model()
+        elif choice == "43":
+            run_least_squares()
+        elif choice == "44":
+            run_r_squared()
+        elif choice == "45":
+            run_polynomial_regression()
+        elif choice == "46":
+            run_time_value_money()
         elif choice == '0':
             print("Exiting...")
             break
